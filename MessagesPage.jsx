@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -12,23 +12,23 @@ import {
 import { Add as AddIcon } from '@mui/icons-material';
 import FilterControls from './FilterControls';
 import MessageList from './MessageList';
-import ChatDrawer from './ChatDrawer'; // We'll assume this is the component displaying the chat for the selected user.
+import ChatBox from './ChatBox'; 
 
 function MessagesPage() {
   const [tab, setTab] = useState(0);
   const [orderBy, setOrderBy] = useState('recent');
   const [selectedUser, setSelectedUser] = useState(null);
 
-  // Default user selection (can be modified or adjusted)
+  
   const initialUser = { id: 1, avatar: 'AP', name: 'Angelin Pore' };
 
-  // If no user is selected, default to the first user in the list
+  
   const handleMessageClick = (user) => {
     setSelectedUser(user);
   };
 
-  // Set the default user on initial load if no user is selected
-  React.useEffect(() => {
+ 
+  useEffect(() => {
     if (!selectedUser) {
       setSelectedUser(initialUser);
     }
@@ -42,16 +42,26 @@ function MessagesPage() {
             Messages
           </Typography>
           <Button
-            variant="contained"
-            startIcon={<AddIcon />}
-            sx={{
-              bgcolor: '#4F46E5',
-              '&:hover': { bgcolor: '#4338CA' },
-              px: 3,
-            }}
-          >
-            New Message
-          </Button>
+          variant="outlined"
+          sx={{
+            borderColor: "#1FB892",
+            color: "#1FB892",
+            fontSize: "17px",
+            backgroundColor: "white",
+            alignItems: "center",
+            borderRadius: "20px",
+            paddingX: 2.5,
+            "&:hover": {
+              borderColor: "#1FB892",
+              backgroundColor: "#1FB892",
+              color: "white",
+            },
+          }}
+          
+          startIcon={<AddIcon />}
+        >
+        NEW MESSAGE
+        </Button>
         </Stack>
 
         <Tabs value={tab} onChange={(_, newValue) => setTab(newValue)} sx={{ mb: 3 }}>
@@ -82,7 +92,7 @@ function MessagesPage() {
           >
             {/* Chat for the selected user */}
             {selectedUser ? (
-              <ChatDrawer user={selectedUser} />
+              <ChatBox user={selectedUser} />
             ) : (
               <Typography variant="h6">Select a user to chat</Typography>
             )}

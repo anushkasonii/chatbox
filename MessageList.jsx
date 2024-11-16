@@ -13,12 +13,12 @@ import {
 
 const messages = [
   { id: 1, avatar: 'AP', name: 'Angelin Pore', message: 'Hello', timestamp: '12/27/2023, 5:35 PM' },
-  { id: 2, avatar: '', name: 'Alex Demo', message: 'Hello', timestamp: '12/27/2023, 5:35 PM' },
+  { id: 2, avatar: 'AD', name: 'Alex Demo', message: 'Hello', timestamp: '12/27/2023, 5:35 PM' },
   { id: 3, avatar: '', name: 'Russ Demo', message: 'Hello', timestamp: '12/27/2023, 5:35 PM' },
   { id: 4, avatar: 'KU', name: 'Kale Ud', message: 'Hello', timestamp: '12/27/2023, 5:35 PM' },
-  { id: 5, avatar: '', name: 'Mia Demo', message: 'Hello', timestamp: '12/27/2023, 5:35 PM' },
-  { id: 6, avatar: 'JJ', name: 'Jime Jo', message: 'Hello', timestamp: '12/27/2023, 5:35 PM' },
-  { id: 7, avatar: 'TA', name: 'Tar', message: 'Hello', timestamp: '12/27/2023, 5:32 PM', isAdmin: true, role: 'Parent' },
+  { id: 5, avatar: 'MD', name: 'Mia Demo', message: 'Hello', timestamp: '12/27/2023, 5:35 PM' },
+  { id: 6, avatar: 'JJ', name: 'Jim Jo', message: 'Hello', timestamp: '12/27/2023, 5:35 PM' },
+  { id: 7, avatar: 'TA', name: 'Tar', message: 'Hello', timestamp: '12/27/2023, 5:32 PM' },
 ];
 
 function MessageList({ onMessageClick }) {
@@ -35,12 +35,12 @@ function MessageList({ onMessageClick }) {
             cursor: 'pointer',
             '&:hover': { bgcolor: 'action.hover' },
           }}
-          onClick={() => onMessageClick(message)} // Pass the selected message object
+          onClick={() => onMessageClick(message)} 
          
         >
           <ListItemAvatar>
             <Avatar sx={{ bgcolor: message.avatar ? 'primary.light' : 'grey.400' }}>
-              {message.avatar || message.name[0]} {/* Show first letter if no avatar */}
+              {message.avatar || message.name[0]} 
             </Avatar>
           </ListItemAvatar>
           <ListItemText
