@@ -13,19 +13,34 @@ import { Add as AddIcon } from '@mui/icons-material';
 import FilterControls from './FilterControls';
 import MessageList from './MessageList';
 import ChatBox from './ChatBox'; 
+import NewMessage from './NewMessage';
 
 function MessagesPage() {
   const [tab, setTab] = useState(0);
   const [orderBy, setOrderBy] = useState('recent');
   const [selectedUser, setSelectedUser] = useState(null);
-
+  const [dialogOpen, setDialogOpen] = useState(false);
   
   const initialUser = { id: 1, avatar: 'AP', name: 'Angelin Pore' };
+
+  
+  const handleOpen = () => {
+    setDialogOpen(true);
+  };
+
+  const handleClose = () => {
+    setDialogOpen(false);
+  };
 
   
   const handleMessageClick = (user) => {
     setSelectedUser(user);
   };
+  const handleSubmit = () => {
+    console.log("New message submitted!");  // Add any submit functionality you need
+    handleClose();  // Close dialog after submission
+  };
+
 
  
   useEffect(() => {
@@ -57,7 +72,7 @@ function MessagesPage() {
               color: "white",
             },
           }}
-          
+          onClick={handleOpen}
           startIcon={<AddIcon />}
         >
         NEW MESSAGE
@@ -99,6 +114,11 @@ function MessagesPage() {
           </Box>
         </Grid>
       </Grid>
+      <NewMessage
+        open={dialogOpen}  // Control dialog visibility based on this prop
+        onClose={handleClose}  // Close dialog on click
+        onSubmit={handleSubmit}  // Handle form submission
+      />
     </Container>
   );
 }

@@ -49,7 +49,6 @@ function FilterControls({ orderBy, setOrderBy }) {
         >
           <MenuItem value="recent">Most recent</MenuItem>
           <MenuItem value="oldest">Unread</MenuItem>
-          <MenuItem value="oldest">All Messages</MenuItem>
         </Select>
       </Box>
     </>
