@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Box, Typography, Avatar, Stack, TextField, Button } from '@mui/material';
 import { Send as SendIcon } from '@mui/icons-material';
 
-// Mock conversation for the selected user
+// Mock conversation for the selected user with added sender info
 const mockMessages = [
-  { id: 1, text: "Hello, how are you?", timestamp: "12:30 PM", isUser: false },
-  { id: 2, text: "I'm good, thanks! How about you?", timestamp: "12:31 PM", isUser: true },
-  { id: 3, text: "I'm doing well. Just wanted to check in.", timestamp: "12:32 PM", isUser: false },
+  { id: 1, text: "Hello, when is the Annual day?", timestamp: "Today, 12:30 PM", sender: "Parent", isUser: false },
+  { id: 2, text: "Hello, it is on 12th December, 2024", timestamp: "Today, 12:31 PM", sender: "Kyle (Staff)", isUser: true },
+  { id: 3, text: "Okay! Thank you", timestamp: "Today, 12:32 PM", sender: "Parent", isUser: false },
 ];
 
 function ChatBox({ user }) {
@@ -47,9 +47,14 @@ function ChatBox({ user }) {
                 p: 2,
               }}
             >
-              <Typography variant="body1">{message.text}</Typography>
-              <Typography variant="caption" sx={{ opacity: 0.7 }}>
-                {message.timestamp}
+              {/* Sender and timestamp */}
+              <Typography variant="caption" sx={{ opacity: 0.7, fontWeight: 'bold' }}>
+                {message.sender} - {message.timestamp}
+              </Typography>
+
+              {/* Message text */}
+              <Typography variant="body1" sx={{ mt: 0.5 }}>
+                {message.text}
               </Typography>
             </Box>
           </Box>
