@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   Stack,
   FormControl,
@@ -7,20 +7,46 @@ import {
   MenuItem,
   Box,
   Typography,
+  Button,
 } from '@mui/material';
+import StudentRoomsDialog from './StudentRoomsDialog';
 
 function FilterControls({ orderBy, setOrderBy }) {
+  const [roomsDialogOpen, setRoomsDialogOpen] = useState(false);
+  const [selectedRooms, setSelectedRooms] = useState([]);
+
+  const handleRoomSelect = (rooms) => {
+    setSelectedRooms(rooms);
+  };
+
   return (
     <>
       <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
         
 
-        <FormControl fullWidth>
-          <InputLabel>Room</InputLabel>
-          <Select label="Room" value="">
-            <MenuItem value="">All Rooms</MenuItem>
-          </Select>
-        </FormControl>
+        <Box sx={{ flex: 1 }}>
+          <Box 
+            onClick={() => setRoomsDialogOpen(true)}
+            sx={{ 
+              border: '1px solid rgba(0, 0, 0, 0.23)',
+              borderRadius: 1,
+              p: 2,
+              width:'100%',
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              '&:hover': {
+                borderColor: 'black'
+              }
+            }}
+          >
+            <Typography color="text.secondary" >
+              {selectedRooms.length ? `${selectedRooms.length} rooms selected` : ' Room'}
+            </Typography>
+            
+          </Box>
+        </Box>
 
         <FormControl fullWidth>
           <InputLabel>Student</InputLabel>
@@ -48,9 +74,16 @@ function FilterControls({ orderBy, setOrderBy }) {
           sx={{ ml: 1 }}
         >
           <MenuItem value="recent">Most recent</MenuItem>
-          <MenuItem value="oldest">Unread</MenuItem>
+          <MenuItem value="oldest">Oldest</MenuItem>
         </Select>
       </Box>
+
+      <StudentRoomsDialog
+        open={roomsDialogOpen}
+        onClose={() => setRoomsDialogOpen(false)}
+        onSelect={handleRoomSelect}
+        selectedRooms={selectedRooms}
+      />
     </>
   );
 }
