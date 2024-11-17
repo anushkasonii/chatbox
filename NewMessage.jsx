@@ -25,10 +25,8 @@ export default function NewMessage({ open, onClose, onSubmit }) {
   const [sendSMS, setSendSMS] = useState(false);
   const [roomsDialogOpen, setRoomsDialogOpen] = useState(false);
   const [selectedRooms, setSelectedRooms] = useState([{ id: 'playschool', label: 'PlaySchool', letter: 'P', color: '#E91E63' }]);
-
-  const handleMessageChange = (event) => {
-    setMessage(event.target.value);
-  };
+  const maxCharacters = 300;
+  
 
   const handleTypeChange = (event) => {
     setType(event.target.value);
@@ -42,6 +40,13 @@ export default function NewMessage({ open, onClose, onSubmit }) {
 
   const handleRoomSelect = (rooms) => {
     setSelectedRooms(rooms);
+  };
+
+  const handleMessageChange = (event) => {
+    const value = event.target.value;
+    if (value.length <= maxCharacters) {
+      setMessage(value);
+    }
   };
 
   return (
@@ -106,11 +111,10 @@ export default function NewMessage({ open, onClose, onSubmit }) {
                 onChange={handleTypeChange}
                 displayEmpty
               >
-                <MenuItem value="">
-                  <em>Alert</em>
-                </MenuItem>
-                <MenuItem value="notice">Notice</MenuItem>
-                <MenuItem value="reminder">Reminder</MenuItem>
+                <MenuItem value=""> <em>Alert</em> </MenuItem>
+                <MenuItem value="notice"> <em>Notice</em> </MenuItem>
+                <MenuItem value="payment"> <em>Payment</em> </MenuItem>
+                <MenuItem value="holiday"> <em>Holiday</em> </MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -126,43 +130,66 @@ export default function NewMessage({ open, onClose, onSubmit }) {
             sx={{ mb: 1 }}
           />
 
-          <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-            <Typography variant="body1" sx={{ color: '#938F99', fontWeight: 'bold' }}>
-              File
+          <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
+            <Typography variant="body1" sx={{ color: '#938F99', fontWeight: 'bold',  }}>
+              File:
             </Typography>
             <Button
               startIcon={<AddIcon />}
               variant="outlined"
-              size="small"
+              sx={{fontSize:'15px'}}
+
             >
               Add file
             </Button>
           </Box>
 
+          <Box sx={{ mb: 2 }}>
           <TextField
             label="Message"
             variant="outlined"
-            value={message}
+            fullWidth
             multiline
             rows={4}
-            placeholder="Hello"
-            fullWidth
+            value={message}
             onChange={handleMessageChange}
+            helperText={`${maxCharacters - message.length} characters remaining`}
+            inputProps={{ maxLength: maxCharacters }}
           />
-          
-          <Typography variant="body2" sx={{ mt: 1, color: '#938F99' }}>
-            295 characters left
-          </Typography>
+        </Box>
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={onClose}>
+          <Button onClick={onClose}
+          sx={{
+                color: "#48454e",
+                fontWeight: "bold",
+                backgroundColor: "transparent",
+                marginBottom: "15px",
+                fontSize:'17px'
+              }}
+         >
             Back
           </Button>
           <Button 
             onClick={handleSubmit} 
             variant="contained" 
-            sx={{ bgcolor: '#4F46E5', '&:hover': { bgcolor: '#4338CA' } }}
+            sx={{
+                borderRadius: "20px",
+                marginBottom: "15px",
+                marginRight: "24px",
+                borderColor: "#1FB892",
+                color: "#fef7ff",
+                fontSize: "15px",
+                fontWeight: "bold",
+                backgroundColor: "#1FB892",
+                alignItems: "center",
+                "&:hover": {
+                  borderColor: "#1FB892",
+                  backgroundColor: "white",
+                  color: "#1FB892",
+                },
+              }}
           >
             Send Message
           </Button>
