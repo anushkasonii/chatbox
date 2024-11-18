@@ -16,6 +16,9 @@ import {
   Checkbox,
   FormControlLabel,
   styled,
+  ListSubheader,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
 import { Close as CloseIcon, Add as AddIcon, Edit as EditIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import StudentRoomsDialog from './StudentRoomsDialog';
@@ -32,14 +35,54 @@ const VisuallyHiddenInput = styled('input')({
   width: 1,
 });
 
+const rooms = [
+    { id: 'camp', label: 'Camp', letter: 'C', color: '#E91E63', students: [
+      { id: 1, name: 'Alex Johnson' },
+      { id: 2, name: 'Sarah Williams' },
+      { id: 3, name: 'Mike Brown' },
+      { id: 4, name: 'Emma Davis' },
+      { id: 5, name: 'James Wilson' },
+    ]},
+    { id: 'daycare', label: 'DayCare', letter: 'D', color: '#FFC107', students: [
+      { id: 6, name: 'Olivia Moore' },
+      { id: 7, name: 'William Taylor' },
+      { id: 8, name: 'Sophia Anderson' },
+      { id: 9, name: 'Lucas Martin' },
+      { id: 10, name: 'Ava Thompson' },
+    ]},
+    { id: 'lkg', label: 'LKG', letter: 'L', color: '#3F51B5', students: [
+      { id: 11, name: 'Ethan Clark' },
+      { id: 12, name: 'Isabella White' },
+      { id: 13, name: 'Mason Lee' },
+      { id: 14, name: 'Charlotte King' },
+      { id: 15, name: 'Henry Wright' },
+    ]},
+    { id: 'playschool', label: 'PlaySchool', letter: 'P', color: '#E91E63', students: [
+      { id: 16, name: 'Amelia Scott' },
+      { id: 17, name: 'Oliver Green' },
+      { id: 18, name: 'Mia Baker' },
+      { id: 19, name: 'Daniel Hill' },
+      { id: 20, name: 'Sofia Adams' },
+    ]},
+    { id: 'demo', label: 'Demo Room', letter: 'D', color: '#E91E63', students: [
+      { id: 21, name: 'Liam Nelson' },
+      { id: 22, name: 'Aria Hall' },
+      { id: 23, name: 'Noah Young' },
+      { id: 24, name: 'Chloe Allen' },
+      { id: 25, name: 'Elijah Cook' },
+    ]},
+  ];
+  
+
 export default function NewMessage({ open, onClose, onSubmit }) {
   const [message, setMessage] = useState('');
   const [type, setType] = useState('');
   const [sendSMS, setSendSMS] = useState(false);
   const [roomsDialogOpen, setRoomsDialogOpen] = useState(false);
-  const [selectedRooms, setSelectedRooms] = useState([{ id: 'playschool', label: 'PlaySchool', letter: 'P', color: '#E91E63' }]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const maxCharacters = 300;
+  const [selectedRooms, setSelectedRooms] = useState([]);
+  const [selectedStudents, setSelectedStudents] = useState([]);
 
   const handleTypeChange = (event) => {
     setType(event.target.value);
@@ -51,8 +94,16 @@ export default function NewMessage({ open, onClose, onSubmit }) {
     }
   };
 
+  const handleRoomChange = (event) => {
+    const newSelectedRooms = event.target.value;
+    setSelectedRooms(newSelectedRooms);
+    // Clear selected students when rooms change
+    setSelectedStudents([]);
+  };
+
   const handleRoomSelect = (rooms) => {
     setSelectedRooms(rooms);
+    setRoomsDialogOpen(false);
   };
 
   const handleMessageChange = (event) => {
@@ -68,6 +119,30 @@ export default function NewMessage({ open, onClose, onSubmit }) {
     }
   };
 
+  const handleStudentChange = (event) => {
+    const value = event.target.value;
+    setSelectedStudents(typeof value === 'string' ? value.split(',') : value);
+  };
+
+  const handleSelectAllStudentsInRoom = (roomId) => {
+    const room = rooms.find(r => r.id === roomId);
+    if (!room) return;
+
+    const roomStudentIds = room.students.map(student => student.id);
+    const alreadyAllSelected = room.students.every(student => 
+      selectedStudents.includes(student.id)
+    );
+
+    if (alreadyAllSelected) {
+      // Deselect all students in this room
+      setSelectedStudents(selectedStudents.filter(id => !roomStudentIds.includes(id)));
+    } else {
+      // Select all students in this room
+      const newSelected = [...new Set([...selectedStudents, ...roomStudentIds])];
+      setSelectedStudents(newSelected);
+    }
+  };
+
   return (
     <>
       <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -80,7 +155,7 @@ export default function NewMessage({ open, onClose, onSubmit }) {
             alignItems: "center",
           }}
         >
-          Message Parent Rooms
+          Send A Message
           <IconButton
             edge="end"
             color="inherit"
@@ -91,33 +166,129 @@ export default function NewMessage({ open, onClose, onSubmit }) {
         </DialogTitle>
 
         <DialogContent>
-          <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap :2  }}>
             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              <Typography variant="body1" sx={{ color: '#938F99', fontWeight: 'bold' }}>
+              <Typography variant="body1" sx={{ color: '#938F99', fontWeight: 'bold',flexDirection: 'column' }}>
                 Recipients:
               </Typography>
-              <Box sx={{ display: 'flex', gap: 1 }}>
-                {selectedRooms.map((room) => (
-                  <Box
-                    key={room.id}
-                    sx={{ 
-                      display: 'inline-flex', 
-                      alignItems: 'center', 
-                      bgcolor: room.color,
-                      color: 'white',
-                      borderRadius: 1,
-                      px: 1,
-                      py: 0.5
-                    }}
-                  >
-                    {room.letter}
-                  </Box>
-                ))}
-              </Box>
+              {/* Room Dropdown */}
+        <FormControl
+          sx={{
+            flex: 1,
+            flexBasis: '30%',
+            minWidth: '200px'
+          }}
+        >
+          <InputLabel>Room</InputLabel>
+          <Select
+            multiple
+            value={selectedRooms}
+            onChange={handleRoomChange}
+            label="Room"
+            renderValue={(selected) => `${selected.length} rooms selected`}
+          >
+            {rooms.map((room) => (
+              <MenuItem 
+                key={room.id} 
+                value={room}
+                sx={{
+                  display: 'flex',
+                  gap: 2,
+                  alignItems: 'center',
+                  bgcolor: selectedRooms.some(r => r.id === room.id) ? 'action.selected' : 'transparent',
+                  '&:hover': {
+                    bgcolor: selectedRooms.some(r => r.id === room.id) ? 'action.selected' : 'action.hover',
+                  }
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    bgcolor: room.color,
+                    color: 'white',
+                    borderRadius: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {room.letter}
+                </Box>
+                <Typography>{room.label}</Typography>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
             </Box>
-            <IconButton onClick={() => setRoomsDialogOpen(true)} size="small">
-              <EditIcon />
-            </IconButton>
+            {/* Student Dropdown */}
+        <FormControl
+          sx={{
+            flex: 2,
+            flexBasis: '30%',
+            minWidth: '200px'
+          }}
+        >
+          <InputLabel>Student</InputLabel>
+          <Select
+            multiple
+            value={selectedStudents}
+            onChange={handleStudentChange}
+            label="Student"
+            renderValue={(selected) => `${selected.length} students selected`}
+          >
+            {selectedRooms.map((room) => [
+              <ListSubheader
+                key={`${room.id}-header`}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  bgcolor: 'background.paper',
+                }}
+              >
+                <Box
+                  sx={{
+                    minWidth: '200 px',
+                    height: 24,
+                    bgcolor: room.color,
+                    color: 'white',
+                    borderRadius: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.8rem',
+                  }}
+                >
+                  {room.letter}
+                </Box>
+                <Typography>{room.label}</Typography>
+                <Checkbox
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSelectAllStudentsInRoom(room.id);
+                  }}
+                  checked={room.students.every(student => selectedStudents.includes(student.id))}
+                  indeterminate={
+                    room.students.some(student => selectedStudents.includes(student.id)) &&
+                    !room.students.every(student => selectedStudents.includes(student.id))
+                  }
+                />
+              </ListSubheader>,
+              ...room.students.map((student) => (
+                <MenuItem
+                  key={student.id}
+                  value={student.id}
+                  sx={{ pl: 4 }}
+                >
+                  <Checkbox checked={selectedStudents.includes(student.id)} />
+                  <ListItemText primary={student.name} />
+                </MenuItem>
+              ))
+            ])}
+          </Select>
+        </FormControl>
           </Box>
 
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 3 }}>
