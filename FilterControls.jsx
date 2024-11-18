@@ -7,109 +7,219 @@ import {
   MenuItem,
   Box,
   Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  Avatar,
   IconButton,
-  Button,
+  Checkbox,
+  ListSubheader,
+  ListItemIcon,
+  ListItemText,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import Chip from '@mui/material/Chip';
 import StudentRoomsDialog from './StudentRoomsDialog';
+
+const rooms = [
+  { id: 'camp', label: 'Camp', letter: 'C', color: '#E91E63', students: [
+    { id: 1, name: 'Alex Johnson' },
+    { id: 2, name: 'Sarah Williams' },
+    { id: 3, name: 'Mike Brown' },
+    { id: 4, name: 'Emma Davis' },
+    { id: 5, name: 'James Wilson' },
+  ]},
+  { id: 'daycare', label: 'DayCare', letter: 'D', color: '#FFC107', students: [
+    { id: 6, name: 'Olivia Moore' },
+    { id: 7, name: 'William Taylor' },
+    { id: 8, name: 'Sophia Anderson' },
+    { id: 9, name: 'Lucas Martin' },
+    { id: 10, name: 'Ava Thompson' },
+  ]},
+  { id: 'lkg', label: 'LKG', letter: 'L', color: '#3F51B5', students: [
+    { id: 11, name: 'Ethan Clark' },
+    { id: 12, name: 'Isabella White' },
+    { id: 13, name: 'Mason Lee' },
+    { id: 14, name: 'Charlotte King' },
+    { id: 15, name: 'Henry Wright' },
+  ]},
+  { id: 'playschool', label: 'PlaySchool', letter: 'P', color: '#E91E63', students: [
+    { id: 16, name: 'Amelia Scott' },
+    { id: 17, name: 'Oliver Green' },
+    { id: 18, name: 'Mia Baker' },
+    { id: 19, name: 'Daniel Hill' },
+    { id: 20, name: 'Sofia Adams' },
+  ]},
+  { id: 'demo', label: 'Demo Room', letter: 'D', color: '#E91E63', students: [
+    { id: 21, name: 'Liam Nelson' },
+    { id: 22, name: 'Aria Hall' },
+    { id: 23, name: 'Noah Young' },
+    { id: 24, name: 'Chloe Allen' },
+    { id: 25, name: 'Elijah Cook' },
+  ]},
+];
 
 function FilterControls({ orderBy, setOrderBy }) {
   const [roomsDialogOpen, setRoomsDialogOpen] = useState(false);
-  const [studentDialogOpen, setStudentDialogOpen] = useState(false); // Added state for Student Dialog
   const [selectedRooms, setSelectedRooms] = useState([]);
+  const [selectedStudents, setSelectedStudents] = useState([]);
 
-  const handleChange = (event) => {
-    const { value } = event.target;
-    setSelectedRooms(value);  // Simply set the value directly without needing Array.isArray
+  const handleRoomChange = (event) => {
+    const newSelectedRooms = event.target.value;
+    setSelectedRooms(newSelectedRooms);
+    // Clear selected students when rooms change
+    setSelectedStudents([]);
   };
-  
 
-  const handleRoomSelect = (room) => {
-    setSelectedRooms((prevRooms) => {
-        if (prevRooms.includes(room)) {
-          return prevRooms.filter((r) => r !== room); // Remove the room if already selected
-        } else {
-          return [...prevRooms, room]; // Add the room if not selected
-        }
-      });
-    setRoomsDialogOpen(false); // Close the dialog after selection
+  const handleStudentChange = (event) => {
+    const value = event.target.value;
+    setSelectedStudents(typeof value === 'string' ? value.split(',') : value);
   };
-  
-  
+
+  const handleSelectAllStudentsInRoom = (roomId) => {
+    const room = rooms.find(r => r.id === roomId);
+    if (!room) return;
+
+    const roomStudentIds = room.students.map(student => student.id);
+    const alreadyAllSelected = room.students.every(student => 
+      selectedStudents.includes(student.id)
+    );
+
+    if (alreadyAllSelected) {
+      // Deselect all students in this room
+      setSelectedStudents(selectedStudents.filter(id => !roomStudentIds.includes(id)));
+    } else {
+      // Select all students in this room
+      const newSelected = [...new Set([...selectedStudents, ...roomStudentIds])];
+      setSelectedStudents(newSelected);
+    }
+  };
+
+  const handleRoomSelect = (rooms) => {
+    setSelectedRooms(rooms);
+    setRoomsDialogOpen(false);
+  };
 
   return (
     <>
       <Stack direction="row" spacing={2} sx={{ mb: 3 }}>
-        {/* Room */}
-        <Box
+        {/* Room Dropdown */}
+        <FormControl
           sx={{
             flex: 1,
-            flexBasis: '30%', // Equal width for Room, Student, and Student Status
+            flexBasis: '30%',
           }}
         >
-          <Box
-            onClick={() => setRoomsDialogOpen(true)}
-            sx={{
-              border: '1px solid rgba(0, 0, 0, 0.23)',
-              borderRadius: 1,
-              p: 2,
-              width: '100%',
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              '&:hover': {
-                borderColor: 'black',
-              },
-            }}
+          <InputLabel>Room</InputLabel>
+          <Select
+            multiple
+            value={selectedRooms}
+            onChange={handleRoomChange}
+            label="Room"
+            renderValue={(selected) => `${selected.length} rooms selected`}
           >
-            <Typography color="text.secondary">
-            {selectedRooms.length ? `${selectedRooms.length} rooms selected` : 'Room'}
-            </Typography>
+            {rooms.map((room) => (
+              <MenuItem 
+                key={room.id} 
+                value={room}
+                sx={{
+                  display: 'flex',
+                  gap: 2,
+                  alignItems: 'center',
+                  bgcolor: selectedRooms.some(r => r.id === room.id) ? 'action.selected' : 'transparent',
+                  '&:hover': {
+                    bgcolor: selectedRooms.some(r => r.id === room.id) ? 'action.selected' : 'action.hover',
+                  }
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    bgcolor: room.color,
+                    color: 'white',
+                    borderRadius: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}
+                >
+                  {room.letter}
+                </Box>
+                <Typography>{room.label}</Typography>
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-
-            
-          </Box>
-        </Box>
-
-        {/* Student */}
-        <Box
+        {/* Student Dropdown */}
+        <FormControl
           sx={{
             flex: 1,
-            flexBasis: '30%', // Equal width for Room, Student, and Student Status
+            flexBasis: '30%',
           }}
-          onClick={() => setStudentDialogOpen(true)}
         >
-          <Box
-            sx={{
-              border: '1px solid rgba(0, 0, 0, 0.23)',
-              borderRadius: 1,
-              p: 2,
-              width: '100%',
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              '&:hover': {
-                borderColor: 'black',
-              },
-            }}
+          <InputLabel>Student</InputLabel>
+          <Select
+            multiple
+            value={selectedStudents}
+            onChange={handleStudentChange}
+            label="Student"
+            renderValue={(selected) => `${selected.length} students selected`}
           >
-            <Typography color="text.secondary">Student</Typography>
-          </Box>
-        </Box>
+            {selectedRooms.map((room) => [
+              <ListSubheader
+                key={`${room.id}-header`}
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 1,
+                  bgcolor: 'background.paper',
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 24,
+                    height: 24,
+                    bgcolor: room.color,
+                    color: 'white',
+                    borderRadius: 1,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: '0.8rem',
+                  }}
+                >
+                  {room.letter}
+                </Box>
+                <Typography>{room.label}</Typography>
+                <Checkbox
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleSelectAllStudentsInRoom(room.id);
+                  }}
+                  checked={room.students.every(student => selectedStudents.includes(student.id))}
+                  indeterminate={
+                    room.students.some(student => selectedStudents.includes(student.id)) &&
+                    !room.students.every(student => selectedStudents.includes(student.id))
+                  }
+                />
+              </ListSubheader>,
+              ...room.students.map((student) => (
+                <MenuItem
+                  key={student.id}
+                  value={student.id}
+                  sx={{ pl: 4 }}
+                >
+                  <Checkbox checked={selectedStudents.includes(student.id)} />
+                  <ListItemText primary={student.name} />
+                </MenuItem>
+              ))
+            ])}
+          </Select>
+        </FormControl>
 
         {/* Student Status */}
         <FormControl
           fullWidth
           sx={{
             flex: 1,
-            flexBasis: '30%', // Equal width for Room, Student, and Student Status
+            flexBasis: '30%',
           }}
         >
           <InputLabel>Student status</InputLabel>
@@ -131,88 +241,9 @@ function FilterControls({ orderBy, setOrderBy }) {
         >
           <MenuItem value="recent">Most recent</MenuItem>
           <MenuItem value="oldest">Unread</MenuItem>
-          
         </Select>
       </Box>
 
-      {/* Student Dialog */}
-      <Dialog
-        open={studentDialogOpen}
-        onClose={() => setStudentDialogOpen(false)}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle>
-          <Typography variant="h6" fontWeight="bold">
-            Select Student
-          </Typography>
-          <IconButton
-            aria-label="close"
-            onClick={() => setStudentDialogOpen(false)}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-            }}
-          >
-            <CloseIcon />
-          </IconButton>
-        </DialogTitle>
-
-        <DialogContent>
-          <Box sx={{ minWidth: 120 }}>
-            <FormControl fullWidth>
-              <InputLabel id="select-room-label">Select Rooms</InputLabel>
-              <Select
-                labelId="select-room-label"
-                id="select-room"
-                multiple
-                value={selectedRooms || []}
-                onChange={handleChange}
-                renderValue={(selected) => (
-                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                    {selected.map((room) => (
-                      <Chip key={room} label={room} />
-                    ))}
-                  </Box>
-                )}
-                sx={{
-                  '& .MuiOutlinedInput-notchedOutline': {
-                    borderColor: '#E0E0E0', // Optional: customize border color
-                  },
-                }}
-              >
-                <MenuItem value="camp1">Camp</MenuItem>
-                <MenuItem value="camp2">Daycare</MenuItem>
-                <MenuItem value="camp3">LKG</MenuItem>
-                <MenuItem value="camp4">Playschool</MenuItem>
-                <MenuItem value="camp5">Demo Room</MenuItem>
-              </Select>
-            </FormControl>
-          </Box>
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Avatar sx={{ bgcolor: '#E0E0E0' }}>GK</Avatar>
-            <Typography>Lane Gilmore</Typography>
-          </Stack>
-          <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 2 }}>
-            <Avatar sx={{ bgcolor: '#E0E0E0' }}>TA</Avatar>
-            <Typography>Hannah Bakers</Typography>
-          </Stack>
-        </DialogContent>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'flex-end',
-            p: 2,
-            borderTop: '1px solid #E0E0E0',
-            bgcolor: '#F8F8F8',
-          }}
-        >
-          <Button onClick={() => setStudentDialogOpen(false)} sx={{ fontSize: '17px' }}>
-            Cancel
-          </Button>
-        </Box>
-      </Dialog>
       <StudentRoomsDialog
         open={roomsDialogOpen}
         onClose={() => setRoomsDialogOpen(false)}

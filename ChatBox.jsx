@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Box, Typography, Avatar, Stack, TextField, Button } from '@mui/material';
 import { Send as SendIcon } from '@mui/icons-material';
 
-// Mock conversation for the selected user with added sender info
 const mockMessages = [
   { id: 1, text: "Hello, when is the Annual day?", timestamp: "Today, 12:30 PM", sender: "Parent", isUser: false },
   { id: 2, text: "Hello, it is on 12th December, 2024", timestamp: "Today, 12:31 PM", sender: "Kyle (Staff)", isUser: true },
@@ -22,38 +21,47 @@ function ChatBox({ user }) {
   return (
     <Box sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       {/* Chat Header */}
-      <Stack direction="row" alignItems="center" spacing={2}>
+      <Stack direction="row" alignItems="center" spacing={2} sx={{ p: 2, borderBottom: 1, borderColor: 'divider', marginTop: '-15px' }}>
         <Avatar sx={{ bgcolor: 'primary.light' }}>{user.avatar}</Avatar>
         <Typography variant="h6">{user.name}</Typography>
       </Stack>
 
       {/* Chat Messages */}
-      <Box sx={{ flexGrow: 1, overflowY: 'auto', mt: 2 }}>
+      <Box sx={{ flexGrow: 1, overflowY: 'auto', p: 2 }}>
         {mockMessages.map((message) => (
           <Box
             key={message.id}
             sx={{
               display: 'flex',
-              justifyContent: message.isUser ? 'flex-end' : 'flex-start',
-              mb: 2,
+              flexDirection: 'column',
+              alignItems: message.isUser ? 'flex-end' : 'flex-start',
+              mb: 1,
             }}
           >
+            {/* Sender and timestamp above message */}
+            <Typography 
+              variant="caption" 
+              sx={{ 
+                mb: 0.5,
+                color: 'text.secondary',
+                fontWeight: 'medium',
+                px: 1
+              }}
+            >
+              {message.sender} • {message.timestamp}
+            </Typography>
+
+            {/* Message box */}
             <Box
               sx={{
                 maxWidth: '70%',
-                bgcolor: message.isUser ? 'primary.main' : 'grey.100',
+                bgcolor: message.isUser ? '#6248ae' : '#f2ecf5',
                 color: message.isUser ? 'white' : 'text.primary',
                 borderRadius: 2,
                 p: 2,
               }}
             >
-              {/* Sender and timestamp */}
-              <Typography variant="caption" sx={{ opacity: 0.7, fontWeight: 'bold' }}>
-                {message.sender} - {message.timestamp}
-              </Typography>
-
-              {/* Message text */}
-              <Typography variant="body1" sx={{ mt: 0.5 }}>
+              <Typography variant="body1">
                 {message.text}
               </Typography>
             </Box>
