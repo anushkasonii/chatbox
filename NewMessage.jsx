@@ -15,9 +15,22 @@ import {
   Typography,
   Checkbox,
   FormControlLabel,
+  styled,
 } from '@mui/material';
-import { Close as CloseIcon, Add as AddIcon, Edit as EditIcon } from '@mui/icons-material';
+import { Close as CloseIcon, Add as AddIcon, Edit as EditIcon, CloudUpload as CloudUploadIcon } from '@mui/icons-material';
 import StudentRoomsDialog from './StudentRoomsDialog';
+
+const VisuallyHiddenInput = styled('input')({
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: 1,
+  overflow: 'hidden',
+  position: 'absolute',
+  bottom: 0,
+  left: 0,
+  whiteSpace: 'nowrap',
+  width: 1,
+});
 
 export default function NewMessage({ open, onClose, onSubmit }) {
   const [message, setMessage] = useState('');
@@ -25,8 +38,8 @@ export default function NewMessage({ open, onClose, onSubmit }) {
   const [sendSMS, setSendSMS] = useState(false);
   const [roomsDialogOpen, setRoomsDialogOpen] = useState(false);
   const [selectedRooms, setSelectedRooms] = useState([{ id: 'playschool', label: 'PlaySchool', letter: 'P', color: '#E91E63' }]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const maxCharacters = 300;
-  
 
   const handleTypeChange = (event) => {
     setType(event.target.value);
@@ -34,7 +47,7 @@ export default function NewMessage({ open, onClose, onSubmit }) {
 
   const handleSubmit = () => {
     if (message.trim()) {
-      onSubmit({ message, selectedRooms });
+      onSubmit({ message, selectedRooms, selectedFiles });
     }
   };
 
@@ -46,6 +59,12 @@ export default function NewMessage({ open, onClose, onSubmit }) {
     const value = event.target.value;
     if (value.length <= maxCharacters) {
       setMessage(value);
+    }
+  };
+
+  const handleFileChange = (event) => {
+    if (event.target.files) {
+      setSelectedFiles(Array.from(event.target.files));
     }
   };
 
@@ -111,10 +130,10 @@ export default function NewMessage({ open, onClose, onSubmit }) {
                 onChange={handleTypeChange}
                 displayEmpty
               >
-                <MenuItem value=""> <em>Alert</em> </MenuItem>
-                <MenuItem value="notice"> <em>Notice</em> </MenuItem>
-                <MenuItem value="payment"> <em>Payment</em> </MenuItem>
-                <MenuItem value="holiday"> <em>Holiday</em> </MenuItem>
+                <MenuItem value=""><em>Alert</em></MenuItem>
+                <MenuItem value="notice"><em>Notice</em></MenuItem>
+                <MenuItem value="payment"><em>Payment</em></MenuItem>
+                <MenuItem value="holiday"><em>Holiday</em></MenuItem>
               </Select>
             </FormControl>
           </Box>
@@ -131,65 +150,76 @@ export default function NewMessage({ open, onClose, onSubmit }) {
           />
 
           <Box sx={{ mb: 3, display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Typography variant="body1" sx={{ color: '#938F99', fontWeight: 'bold',  }}>
+            <Typography variant="body1" sx={{ color: '#938F99', fontWeight: 'bold' }}>
               File:
             </Typography>
             <Button
+              component="label"
               startIcon={<AddIcon />}
               variant="outlined"
-              sx={{fontSize:'15px'}}
-
+              sx={{ fontSize: '15px' }}
             >
               Add file
+              <VisuallyHiddenInput
+                type="file"
+                onChange={handleFileChange}
+                multiple
+              />
             </Button>
+            {selectedFiles.length > 0 && (
+              <Typography variant="body2" sx={{ color: '#938F99' }}>
+                {selectedFiles.length} file(s) selected
+              </Typography>
+            )}
           </Box>
 
           <Box sx={{ mb: 2 }}>
-          <TextField
-            label="Message"
-            variant="outlined"
-            fullWidth
-            multiline
-            rows={4}
-            value={message}
-            onChange={handleMessageChange}
-            helperText={`${maxCharacters - message.length} characters remaining`}
-            inputProps={{ maxLength: maxCharacters }}
-          />
-        </Box>
+            <TextField
+              label="Message"
+              variant="outlined"
+              fullWidth
+              multiline
+              rows={4}
+              value={message}
+              onChange={handleMessageChange}
+              helperText={`${maxCharacters - message.length} characters remaining`}
+              inputProps={{ maxLength: maxCharacters }}
+            />
+          </Box>
         </DialogContent>
 
         <DialogActions>
-          <Button onClick={onClose}
-          sx={{
-                color: "#48454e",
-                fontWeight: "bold",
-                backgroundColor: "transparent",
-                marginBottom: "15px",
-                fontSize:'17px'
-              }}
-         >
+          <Button 
+            onClick={onClose}
+            sx={{
+              color: "#48454e",
+              fontWeight: "bold",
+              backgroundColor: "transparent",
+              marginBottom: "15px",
+              fontSize: '17px'
+            }}
+          >
             Back
           </Button>
           <Button 
             onClick={handleSubmit} 
             variant="contained" 
             sx={{
-                borderRadius: "20px",
-                marginBottom: "15px",
-                marginRight: "24px",
+              borderRadius: "20px",
+              marginBottom: "15px",
+              marginRight: "24px",
+              borderColor: "#1FB892",
+              color: "#fef7ff",
+              fontSize: "15px",
+              fontWeight: "bold",
+              backgroundColor: "#1FB892",
+              alignItems: "center",
+              "&:hover": {
                 borderColor: "#1FB892",
-                color: "#fef7ff",
-                fontSize: "15px",
-                fontWeight: "bold",
-                backgroundColor: "#1FB892",
-                alignItems: "center",
-                "&:hover": {
-                  borderColor: "#1FB892",
-                  backgroundColor: "white",
-                  color: "#1FB892",
-                },
-              }}
+                backgroundColor: "white",
+                color: "#1FB892",
+              },
+            }}
           >
             Send Message
           </Button>
